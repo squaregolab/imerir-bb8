@@ -1,0 +1,19 @@
+int ana_a = 3;// initalisation des voie moteurs
+int ana_b = 11;
+
+void setup()
+{
+  pinMode(ana_a, OUTPUT);
+  Serial.begin(9600);
+}
+  
+void loop()
+{
+  int value;
+  for(value = 0 ; value <= 250; value+=5)
+  {
+    analogWrite(ana_a, value);// donne une valeur de vitesse au moteur 80 demarrage 250 valeur max
+    Serial.print(value);
+    delay(1000);
+  }
+}

@@ -1,0 +1,142 @@
+/* Serial Loop */
+
+#include <SoftwareSerial.h>
+
+#define RXPIN 0
+#define TXPIN 1
+
+/**
+ * \author BOUVIER Thibault, GEORGET Marvin, Aurelien WILLAUMEZ 
+ * \version V1.0
+ * \date 8 décembre 2016
+ * \brief Code pour le control des moteurs grace a l'appli mobile arduino bluetooth
+ * 
+ */
+
+int HORIZONTALE = 5;
+int VERTICALE = 6;
+int DIAGONALE = 4;
+int ana_a = 3;// initalisation des voie moteurs
+int ana_b = 11;
+int MarcheAvantA = 12;
+int MarcheAvantB = 13;
+
+SoftwareSerial mySerial(RXPIN, TXPIN); // RX, TX
+char commande; // pour lire les commandes envoyé par le module bluetooth
+
+void setup() {
+  Serial.begin(9600);   
+  Serial.println("AT");
+
+  mySerial.begin(38400);
+  mySerial.println("AT");
+
+  pinMode(MarcheAvantB, OUTPUT);
+  pinMode(MarcheAvantA, OUTPUT);
+  pinMode(ana_a, OUTPUT);
+  pinMode(ana_b, OUTPUT);
+  pinMode(HORIZONTALE, OUTPUT);
+  pinMode(VERTICALE, OUTPUT);
+  pinMode(DIAGONALE, OUTPUT);
+  digitalWrite(VERTICALE, LOW);
+  digitalWrite(HORIZONTALE, LOW);
+  digitalWrite(DIAGONALE, LOW);
+ 
+}
+
+void loop() {
+
+  while (Serial.available()) {
+    commande = Serial.read();
+    /*Serial.print(commande); //echo
+    mySerial.print(commande);
+    Serial.print("\n");*/
+
+        switch(commande)
+    {
+      case 'F' : 
+        digitalWrite(VERTICALE, HIGH);
+        digitalWrite(DIAGONALE, LOW);
+        digitalWrite(HORIZONTALE, LOW);
+        analogWrite(ana_a, 250);// donne une valeur de vitesse au moteur 80 demarrage 250 valeur max
+        analogWrite(ana_b, 250);   
+        break;
+
+      case 'B' : 
+        digitalWrite(MarcheAvantA, HIGH);
+        digitalWrite(MarcheAvantB, HIGH);
+        digitalWrite(VERTICALE, HIGH);
+        digitalWrite(DIAGONALE, LOW);
+        digitalWrite(HORIZONTALE, LOW);
+        analogWrite(ana_a, 250);// donne une valeur de vitesse au moteur 80 demarrage 250 valeur max
+        analogWrite(ana_b, 250);   
+        break;
+
+      case 'L' : 
+        digitalWrite(MarcheAvantA, HIGH);
+        digitalWrite(MarcheAvantB, LOW);
+        digitalWrite(VERTICALE, LOW);
+        digitalWrite(DIAGONALE, LOW);
+        digitalWrite(HORIZONTALE, HIGH);
+        analogWrite(ana_a, 250);// donne une valeur de vitesse au moteur 80 demarrage 250 valeur max
+        analogWrite(ana_b, 250);   
+        break;
+
+      case 'R' : 
+        digitalWrite(MarcheAvantB, HIGH);
+        digitalWrite(MarcheAvantA, LOW);
+        digitalWrite(VERTICALE, LOW);
+        digitalWrite(DIAGONALE, LOW);
+        digitalWrite(HORIZONTALE, HIGH);
+        analogWrite(ana_a, 250);// donne une valeur de vitesse au moteur 80 demarrage 250 valeur max
+        analogWrite(ana_b, 250);   
+        break;
+
+      case 'G' : 
+        digitalWrite(VERTICALE, LOW);
+        digitalWrite(DIAGONALE, HIGH);
+        digitalWrite(HORIZONTALE, LOW);
+        analogWrite(ana_a, 125);// donne une valeur de vitesse au moteur 80 demarrage 250 valeur max
+        analogWrite(ana_b, 250);   
+        break;
+
+      case 'I' : 
+        digitalWrite(VERTICALE, LOW);
+        digitalWrite(DIAGONALE, HIGH);
+        digitalWrite(HORIZONTALE, LOW);
+        analogWrite(ana_a, 250);// donne une valeur de vitesse au moteur 80 demarrage 250 valeur max
+        analogWrite(ana_b, 125);   
+        break;
+
+      case 'H' : 
+        digitalWrite(MarcheAvantA, HIGH);
+        digitalWrite(MarcheAvantB, HIGH);
+        digitalWrite(VERTICALE, LOW);
+        digitalWrite(DIAGONALE, HIGH);
+        digitalWrite(HORIZONTALE, LOW);
+        analogWrite(ana_a, 125);// donne une valeur de vitesse au moteur 80 demarrage 250 valeur max
+        analogWrite(ana_b, 250);   
+        break;
+
+      case 'J' : 
+        digitalWrite(MarcheAvantA, HIGH);
+        digitalWrite(MarcheAvantB, HIGH);
+        digitalWrite(VERTICALE, LOW);
+        digitalWrite(DIAGONALE, HIGH);
+        digitalWrite(HORIZONTALE, LOW);
+        analogWrite(ana_a, 250);// donne une valeur de vitesse au moteur 80 demarrage 250 valeur max
+        analogWrite(ana_b, 125);   
+        break;
+
+      case 'S' : 
+        digitalWrite(MarcheAvantA, LOW);
+        digitalWrite(MarcheAvantB, LOW);
+        digitalWrite(VERTICALE, LOW);
+        digitalWrite(DIAGONALE, LOW);
+        digitalWrite(HORIZONTALE, LOW);
+        analogWrite(ana_a, 0);// donne une valeur de vitesse au moteur 80 demarrage 250 valeur max
+        analogWrite(ana_b, 0);   
+        break;
+    }
+  } 
+}

@@ -1,0 +1,580 @@
+/**
+ * \author Thibault BOUVIER, Marvin GEORGET, Aurelien WILLAUMEZ 
+ * \version V1.0
+ * \date 8 décembre 2016
+ * \brief Code pour le control des moteurs grace a l'appli mobile arduino bluetooth
+ * 
+ */
+
+
+#include <SoftwareSerial.h>
+#include "I2Cdev.h"
+#include "MPU6050_6Axis_MotionApps20.h"
+//#include "MPU6050.h" // not necessary if using MotionApps include file
+
+
+/*------------------INIT BUZZER------------------*/
+/*
+#define NOTE_B0  31
+#define NOTE_C1  33
+#define NOTE_CS1 35
+#define NOTE_D1  37
+#define NOTE_DS1 39
+#define NOTE_E1  41
+#define NOTE_F1  44
+#define NOTE_FS1 46
+#define NOTE_G1  49
+#define NOTE_GS1 52
+#define NOTE_A1  55
+#define NOTE_AS1 58
+#define NOTE_B1  62
+#define NOTE_C2  65
+#define NOTE_CS2 69
+#define NOTE_D2  73
+#define NOTE_DS2 78
+#define NOTE_E2  82
+#define NOTE_F2  87
+#define NOTE_FS2 93
+#define NOTE_G2  98
+#define NOTE_GS2 104
+#define NOTE_A2  110
+#define NOTE_AS2 117
+#define NOTE_B2  123
+#define NOTE_C3  131
+#define NOTE_CS3 139
+#define NOTE_D3  147
+#define NOTE_DS3 156
+#define NOTE_E3  165
+#define NOTE_F3  175
+#define NOTE_FS3 185
+#define NOTE_G3  196
+#define NOTE_GS3 208
+#define NOTE_A3  220
+#define NOTE_AS3 233
+#define NOTE_B3  247
+#define NOTE_C4  262
+#define NOTE_CS4 277
+#define NOTE_D4  294
+#define NOTE_DS4 311
+#define NOTE_E4  330
+#define NOTE_F4  349
+#define NOTE_FS4 370
+#define NOTE_G4  392
+#define NOTE_GS4 415
+#define NOTE_A4  440
+#define NOTE_AS4 466
+#define NOTE_B4  494
+#define NOTE_C5  523
+#define NOTE_CS5 554
+#define NOTE_D5  587
+#define NOTE_DS5 622
+#define NOTE_E5  659
+#define NOTE_F5  698
+#define NOTE_FS5 740
+#define NOTE_G5  784
+#define NOTE_GS5 831
+#define NOTE_A5  880
+#define NOTE_AS5 932
+#define NOTE_B5  988
+#define NOTE_C6  1047
+#define NOTE_CS6 1109
+#define NOTE_D6  1175
+#define NOTE_DS6 1245
+#define NOTE_E6  1319
+#define NOTE_F6  1397
+#define NOTE_FS6 1480
+#define NOTE_G6  1568
+#define NOTE_GS6 1661
+#define NOTE_A6  1760
+#define NOTE_AS6 1865
+#define NOTE_B6  1976
+#define NOTE_C7  2093
+#define NOTE_CS7 2217
+#define NOTE_D7  2349
+#define NOTE_DS7 2489
+#define NOTE_E7  2637
+#define NOTE_F7  2794
+#define NOTE_FS7 2960
+#define NOTE_G7  3136
+#define NOTE_GS7 3322
+#define NOTE_A7  3520
+#define NOTE_AS7 3729
+#define NOTE_B7  3951
+#define NOTE_C8  4186
+#define NOTE_CS8 4435
+#define NOTE_D8  4699
+#define NOTE_DS8 4978
+
+// notes in the melody Darth Vader's Theme Song
+ int melody1[] = {
+   NOTE_G4, NOTE_G4,NOTE_G4, NOTE_DS4, NOTE_AS4, NOTE_G4, NOTE_DS4, NOTE_AS4, NOTE_G4, NOTE_D5, NOTE_D5, NOTE_D5, NOTE_DS5, NOTE_AS4, NOTE_FS4, NOTE_DS4, NOTE_AS4, NOTE_G4, NOTE_G5, NOTE_G4, NOTE_G4, NOTE_G5, NOTE_FS5, NOTE_F5, NOTE_E5, NOTE_DS5, NOTE_E5, 0, NOTE_GS4, NOTE_CS5, NOTE_C5, NOTE_B4, NOTE_AS4, NOTE_A4, NOTE_AS4, 0, NOTE_DS4, NOTE_FS4, NOTE_DS4, NOTE_FS4, NOTE_AS4, NOTE_G4, NOTE_AS4, NOTE_D5, NOTE_G5, NOTE_G4, NOTE_G4, NOTE_G5, NOTE_FS5, NOTE_F5, NOTE_E5, NOTE_DS5, NOTE_E5, 0, NOTE_GS4, NOTE_CS5, NOTE_C5, NOTE_B4, NOTE_AS4, NOTE_A4, NOTE_AS4, 0, NOTE_DS4, NOTE_FS4, NOTE_DS4, NOTE_AS4, NOTE_G4, NOTE_DS4, NOTE_AS4, NOTE_G4 };
+// note durations for Darth Vader's Theme Song: 4 = quarter note, 8 = eighth note, etc.:
+ int noteDurations1[] = {
+   4, 4, 4, 6, 16, 4, 6, 16, 2, 4, 4, 4, 6, 16, 4, 6, 16, 2, 4, 6, 16, 4, 6, 16, 16, 16, 8, 8, 8, 4, 6, 16, 16, 16, 8, 8, 8, 4, 6, 16, 4, 6, 16, 2, 4, 6, 16, 4, 6, 16, 16, 16, 8, 8, 8, 4, 6, 16, 16, 16, 8, 8, 8, 4, 6, 16, 4, 6, 16, 2,};
+
+ // Notes in the melody Cantina Band
+ int melody2[] = {
+ NOTE_A4, 0, NOTE_D5, 0, NOTE_A4, 0, NOTE_D5, 0, NOTE_A4, NOTE_D5, 0, NOTE_A4, 0, 0, NOTE_GS4, NOTE_A4, 0, NOTE_A4, NOTE_GS4, NOTE_A4, NOTE_G4, 0, NOTE_FS4, NOTE_G4, NOTE_FS4, NOTE_F4, NOTE_D4, NOTE_A4, 0, NOTE_D5, 0, NOTE_A4, 0, NOTE_D5, 0, NOTE_A4, NOTE_D5, 0, NOTE_A4, 0, 0, NOTE_GS4, NOTE_A4, 0, NOTE_G4, 0, NOTE_G4, NOTE_FS4, NOTE_G4, 0, NOTE_C5, NOTE_AS4, NOTE_A4, NOTE_G4, NOTE_A4, 0, NOTE_D5, 0, NOTE_A4, 0, NOTE_D5, 0, NOTE_A4, NOTE_D5, 0, NOTE_A4, 0, 0, NOTE_GS4, NOTE_A4, 0, NOTE_C5,0, 0, NOTE_C5, NOTE_A4, NOTE_G4, 0, NOTE_F4, NOTE_D4, NOTE_D4, NOTE_F4, NOTE_A4, NOTE_C5, NOTE_DS5, NOTE_D5, NOTE_GS4, NOTE_A4, 0, NOTE_F4, 0};
+ // note duration for Cantina Band
+ int noteDurations2[] = {
+ 4, 64, 4, 64, 4, 64, 4, 64, 8, 4, 64, 8, 64, 8, 8, 4, 64, 8, 8, 8, 8, 8, 8, 8, 8, 2.666, 1.99, 4, 64, 4, 64, 4, 64, 4, 64, 8, 4, 64, 8, 64, 8, 8, 4, 64, 8, 8, 2.666, 8, 4, 64, 8, 4, 4, 2.666, 4, 64, 4, 64, 4, 64, 4, 64, 8, 4, 64, 8, 64, 8, 8, 4, 64, 8, 64, 8, 2.666, 8, 4, 64, 2.666, 1.99, 2, 2, 2, 2, 4, 4, 8, 4, 64, 4, 2};
+
+// notes in melody May the Force be with You
+int melody5[] = {
+ NOTE_G3, NOTE_C4, NOTE_D4, NOTE_DS4, NOTE_F4, NOTE_DS4, NOTE_G3, NOTE_G3, NOTE_C4, NOTE_D4, NOTE_DS4, NOTE_G3, NOTE_DS4, NOTE_C4, NOTE_G4, NOTE_F4, 0, NOTE_G3, NOTE_C4, NOTE_D4, NOTE_DS4, NOTE_G3, NOTE_G4, NOTE_DS4, NOTE_C5, NOTE_C4, NOTE_DS4, NOTE_D4, NOTE_C4, NOTE_G4, NOTE_DS4, NOTE_C4, NOTE_G3, NOTE_G3, NOTE_G3, NOTE_C4, 0 };
+// Note duration for May the Force Be with You
+int noteDurations5[] = {
+  2, 1, 1.333, 8, 8, 1, 1.333, 4, 1.333, 4, 4, 4, 3, 3, 3, 1, 2, 2, 1.333, 4, 1.333, 8, 1.333, 8, 1, 2, 3, 3, 3, 1.2, 3, 3, 2, 1.333, 8, 1, 2 };
+
+*/
+
+/*------------------------------------*/
+
+
+#define RXPIN 0
+#define TXPIN 1
+
+MPU6050 mpu;
+
+#define OUTPUT_READABLE_YAWPITCHROLL
+#define INTERRUPT_PIN 2  // use pin 2 on Arduino Uno & most boards
+#define LED_PIN  7 // (Arduino is 13, Teensy is 11, Teensy++ is 6)
+
+bool blinkState = false;
+
+// MPU control/status vars
+bool dmpReady = false;  // set true if DMP init was successful
+uint8_t mpuIntStatus;   // holds actual interrupt status byte from MPU
+uint8_t devStatus;      // return status after each device operation (0 = success, !0 = error)
+uint16_t packetSize;    // expected DMP packet size (default is 42 bytes)
+uint16_t fifoCount;     // count of all bytes currently in FIFO
+uint8_t fifoBuffer[64]; // FIFO storage buffer
+
+// orientation/motion vars
+Quaternion q;           // [w, x, y, z]         quaternion container
+VectorInt16 aa;         // [x, y, z]            accel sensor measurements
+VectorInt16 aaReal;     // [x, y, z]            gravity-free accel sensor measurements
+VectorInt16 aaWorld;    // [x, y, z]            world-frame accel sensor measurements
+VectorFloat gravity;    // [x, y, z]            gravity vector
+float euler[3];         // [psi, theta, phi]    Euler angle container
+float ypr[3];           // [yaw, pitch, roll]   yaw/pitch/roll container and gravity vector
+
+int HORIZONTALE = 5;
+int VERTICALE = 6;
+int DIAGONALE = 4;
+int ana_a = 3;// initalisation des voie moteurs
+int ana_b = 11;
+int MarcheAvantA = 12;
+int MarcheAvantB = 13;
+
+SoftwareSerial mySerial(RXPIN, TXPIN); // Sur le bluetooth TX et RX
+SoftwareSerial mySerialGy(A4, A5); // Sur le gyro SDA, SCL
+char commande; // pour lire les commandes envoyé par le module bluetooth
+
+//////////
+int buzzer = 7;
+
+/////////
+#include<Wire.h>
+const int MPU_addr=0x68;  // I2C address of the MPU-6050
+int16_t AcX,AcY,AcZ,Tmp,GyX,GyY,GyZ;
+
+// ================================================================
+// ===               INTERRUPT DETECTION ROUTINE                ===
+// ================================================================
+
+volatile bool mpuInterrupt = false;     // indicates whether MPU interrupt pin has gone high
+void dmpDataReady() {
+    mpuInterrupt = true;
+}
+
+// ================================================================
+// ===                      INITIAL SETUP                       ===
+// ================================================================
+
+
+
+void setup() {
+
+  Serial.begin(9600);
+
+// join I2C bus (I2Cdev library doesn't do this automatically)
+  #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
+      Wire.begin();
+      Wire.setClock(400000); // 400kHz I2C clock. Comment this line if having compilation difficulties
+  #elif I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE
+      Fastwire::setup(400, true);
+  #endif
+
+  // initialize serial communication
+  // (115200 chosen because it is required for Teapot Demo output, but it's
+  // really up to you depending on your project)
+  mySerialGy.begin(115200);
+  while (!mySerialGy); // wait for Leonardo enumeration, others continue immediately
+
+  // NOTE: 8MHz or slower host processors, like the Teensy @ 3.3v or Ardunio
+  // Pro Mini running at 3.3v, cannot handle this baud rate reliably due to
+  // the baud timing being too misaligned with processor ticks. You must use
+  // 38400 or slower in these cases, or use some kind of external separate
+  // crystal solution for the UART timer.
+
+  // initialize device
+  mySerialGy.println(F("Initializing I2C devices..."));
+  mpu.initialize();
+  pinMode(INTERRUPT_PIN, INPUT);
+
+  // verify connection
+  mySerialGy.println(F("Testing device connections..."));
+  mySerialGy.println(mpu.testConnection() ? F("MPU6050 connection successful") : F("MPU6050 connection failed"));
+
+  // wait for ready
+  mySerialGy.println(F("\nSend any character to begin DMP programming and demo: "));
+  while (mySerialGy.available() && mySerialGy.read()); // empty buffer
+  while (!mySerialGy.available());                 // wait for data
+  while (mySerialGy.available() && mySerialGy.read()); // empty buffer again
+
+  // load and configure the DMP
+  mySerialGy.println(F("Initializing DMP..."));
+  devStatus = mpu.dmpInitialize();
+
+  // supply your own gyro offsets here, scaled for min sensitivity
+  mpu.setXGyroOffset(220);
+  mpu.setYGyroOffset(76);
+  mpu.setZGyroOffset(-85);
+  mpu.setZAccelOffset(1788); // 1688 factory default for my test chip
+
+  // make sure it worked (returns 0 if so)
+  if (devStatus == 0) {
+      // turn on the DMP, now that it's ready
+      mySerialGy.println(F("Enabling DMP..."));
+      mpu.setDMPEnabled(true);
+
+      // enable Arduino interrupt detection
+      mySerialGy.println(F("Enabling interrupt detection (Arduino external interrupt 0)..."));
+      attachInterrupt(digitalPinToInterrupt(INTERRUPT_PIN), dmpDataReady, RISING);
+      mpuIntStatus = mpu.getIntStatus();
+
+      // set our DMP Ready flag so the main loop() function knows it's okay to use it
+      mySerialGy.println(F("DMP ready! Waiting for first interrupt..."));
+      dmpReady = true;
+
+      // get expected DMP packet size for later comparison
+      packetSize = mpu.dmpGetFIFOPacketSize();
+  } else {
+      // ERROR!
+      // 1 = initial memory load failed
+      // 2 = DMP configuration updates failed
+      // (if it's going to break, usually the code will be 1)
+      mySerialGy.print(F("DMP Initialization failed (code "));
+      mySerialGy.print(devStatus);
+      mySerialGy.println(F(")"));
+  }
+
+  // configure LED for output
+  pinMode(LED_PIN, OUTPUT);
+
+  /*-----------------*/
+  /*   
+  Serial.println("AT");
+  
+  mySerial.begin(38400);
+  mySerial.println("AT");
+  
+  pinMode(MarcheAvantB, OUTPUT);
+  pinMode(MarcheAvantA, OUTPUT);
+  pinMode(ana_a, OUTPUT);
+  pinMode(ana_b, OUTPUT);
+  pinMode(HORIZONTALE, OUTPUT);
+  pinMode(VERTICALE, OUTPUT);
+  pinMode(DIAGONALE, OUTPUT);
+  digitalWrite(VERTICALE, LOW);
+  digitalWrite(HORIZONTALE, LOW);
+  digitalWrite(DIAGONALE, LOW);
+  
+  /////////////////
+  pinMode(buzzer, OUTPUT);
+  
+  /////////////////
+  Wire.begin();
+  Wire.beginTransmission(MPU_addr);
+  Wire.write(0x6B);  // PWR_MGMT_1 register
+  Wire.write(0);     // set to zero (wakes up the MPU-6050)
+  Wire.endTransmission(true);
+  */
+}
+
+
+// ================================================================
+// ===                    MAIN PROGRAM LOOP                     ===
+// ================================================================
+
+
+void loop() {
+  
+  // if programming failed, don't try to do anything
+    if (!dmpReady) return;
+
+    // wait for MPU interrupt or extra packet(s) available
+    while (!mpuInterrupt && fifoCount < packetSize) {
+        // other program behavior stuff here
+        // .
+        // .
+        // .
+        // if you are really paranoid you can frequently test in between other
+        // stuff to see if mpuInterrupt is true, and if so, "break;" from the
+        // while() loop to immediately process the MPU data
+        // .
+        // .
+        // .
+    }
+
+    // reset interrupt flag and get INT_STATUS byte
+    mpuInterrupt = false;
+    mpuIntStatus = mpu.getIntStatus();
+
+    // get current FIFO count
+    fifoCount = mpu.getFIFOCount();
+
+    // check for overflow (this should never happen unless our code is too inefficient)
+    if ((mpuIntStatus & 0x10) || fifoCount == 1024) {
+        // reset so we can continue cleanly
+        mpu.resetFIFO();
+        mySerialGy.println(F("FIFO overflow!"));
+
+    // otherwise, check for DMP data ready interrupt (this should happen frequently)
+    } else if (mpuIntStatus & 0x02) {
+        // wait for correct available data length, should be a VERY short wait
+        while (fifoCount < packetSize) fifoCount = mpu.getFIFOCount();
+
+        // read a packet from FIFO
+        mpu.getFIFOBytes(fifoBuffer, packetSize);
+        
+        // track FIFO count here in case there is > 1 packet available
+        // (this lets us immediately read more without waiting for an interrupt)
+        fifoCount -= packetSize;
+
+        #ifdef OUTPUT_READABLE_QUATERNION
+            // display quaternion values in easy matrix form: w x y z
+            mpu.dmpGetQuaternion(&q, fifoBuffer);
+            mySerialGy.print("quat\t");
+            mySerialGy.print(q.w);
+            mySerialGy.print("\t");
+            mySerialGy.print(q.x);
+            mySerialGy.print("\t");
+            mySerialGy.print(q.y);
+            mySerialGy.print("\t");
+            mySerialGy.println(q.z);
+        #endif
+
+        #ifdef OUTPUT_READABLE_EULER
+            // display Euler angles in degrees
+            mpu.dmpGetQuaternion(&q, fifoBuffer);
+            mpu.dmpGetEuler(euler, &q);
+            mySerialGy.print("euler\t");
+            mySerialGy.print(euler[0] * 180/M_PI);
+            mySerialGy.print("\t");
+            mySerialGy.print(euler[1] * 180/M_PI);
+            mySerialGy.print("\t");
+            mySerialGy.println(euler[2] * 180/M_PI);
+        #endif
+
+        #ifdef OUTPUT_READABLE_YAWPITCHROLL
+            // display Euler angles in degrees
+            mpu.dmpGetQuaternion(&q, fifoBuffer);
+            mpu.dmpGetGravity(&gravity, &q);
+            mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
+            mySerialGy.print("ypr\t");
+            mySerialGy.print(ypr[0] * 180/M_PI);
+            mySerialGy.print("\t");
+            mySerialGy.print(ypr[1] * 180/M_PI);
+            mySerialGy.print("\t");
+            mySerialGy.println(ypr[2] * 180/M_PI);
+        #endif
+
+        #ifdef OUTPUT_READABLE_REALACCEL
+            // display real acceleration, adjusted to remove gravity
+            mpu.dmpGetQuaternion(&q, fifoBuffer);
+            mpu.dmpGetAccel(&aa, fifoBuffer);
+            mpu.dmpGetGravity(&gravity, &q);
+            mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
+            mySerialGy.print("areal\t");
+            mySerialGy.print(aaReal.x);
+            mySerialGy.print("\t");
+            mySerialGy.print(aaReal.y);
+            mySerialGy.print("\t");
+            mySerialGy.println(aaReal.z);
+        #endif
+
+        #ifdef OUTPUT_READABLE_WORLDACCEL
+            // display initial world-frame acceleration, adjusted to remove gravity
+            // and rotated based on known orientation from quaternion
+            mpu.dmpGetQuaternion(&q, fifoBuffer);
+            mpu.dmpGetAccel(&aa, fifoBuffer);
+            mpu.dmpGetGravity(&gravity, &q);
+            mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
+            mpu.dmpGetLinearAccelInWorld(&aaWorld, &aaReal, &q);
+            mySerialGy.print("aworld\t");
+            mySerialGy.print(aaWorld.x);
+            mySerialGy.print("\t");
+            mySerialGy.print(aaWorld.y);
+            mySerialGy.print("\t");
+            mySerialGy.println(aaWorld.z);
+        #endif
+    
+        #ifdef OUTPUT_TEAPOT
+            // display quaternion values in InvenSense Teapot demo format:
+            teapotPacket[2] = fifoBuffer[0];
+            teapotPacket[3] = fifoBuffer[1];
+            teapotPacket[4] = fifoBuffer[4];
+            teapotPacket[5] = fifoBuffer[5];
+            teapotPacket[6] = fifoBuffer[8];
+            teapotPacket[7] = fifoBuffer[9];
+            teapotPacket[8] = fifoBuffer[12];
+            teapotPacket[9] = fifoBuffer[13];
+            mySerialGy.write(teapotPacket, 14);
+            teapotPacket[11]++; // packetCount, loops at 0xFF on purpose
+        #endif
+
+        // blink LED to indicate activity
+        blinkState = !blinkState;
+        digitalWrite(LED_PIN, blinkState);
+    }
+
+  //------------------------
+  /*
+  while (mySerial.available()) {
+    commande = mySerial.read();
+    Serial.print(commande);
+    Serial.print("\n");
+  }
+
+  while (Serial.available()) {
+    commande = Serial.read();
+    Serial.print(commande); //echo
+    mySerial.print(commande);
+      Serial.print("\n");
+
+    switch(commande)
+    {
+      case 'F' : 
+        
+        digitalWrite(MarcheAvantA, LOW);
+        digitalWrite(MarcheAvantB, LOW);
+        digitalWrite(VERTICALE, HIGH);
+        digitalWrite(DIAGONALE, LOW);
+        digitalWrite(HORIZONTALE, LOW);
+        analogWrite(ana_a, 250);// donne une valeur de vitesse au moteur 80 demarrage 250 valeur max
+        analogWrite(ana_b, 250);   
+        break;
+
+      case 'B' : 
+        digitalWrite(MarcheAvantA, HIGH);
+        digitalWrite(MarcheAvantB, HIGH);
+        digitalWrite(VERTICALE, HIGH);
+        digitalWrite(DIAGONALE, LOW);
+        digitalWrite(HORIZONTALE, LOW);
+        analogWrite(ana_a, 250);// donne une valeur de vitesse au moteur 80 demarrage 250 valeur max
+        analogWrite(ana_b, 250);   
+        break;
+
+      case 'L' : 
+        digitalWrite(MarcheAvantA, HIGH);
+        digitalWrite(MarcheAvantB, LOW);
+        digitalWrite(VERTICALE, LOW);
+        digitalWrite(DIAGONALE, LOW);
+        digitalWrite(HORIZONTALE, HIGH);
+        analogWrite(ana_a, 250);// donne une valeur de vitesse au moteur 80 demarrage 250 valeur max
+        analogWrite(ana_b, 250);   
+        break;
+
+      case 'R' : 
+        digitalWrite(MarcheAvantB, HIGH);
+        digitalWrite(MarcheAvantA, LOW);
+        digitalWrite(VERTICALE, LOW);
+        digitalWrite(DIAGONALE, LOW);
+        digitalWrite(HORIZONTALE, HIGH);
+        analogWrite(ana_a, 250);// donne une valeur de vitesse au moteur 80 demarrage 250 valeur max
+        analogWrite(ana_b, 250);   
+        break;
+
+      case 'G' : 
+        digitalWrite(VERTICALE, LOW);
+        digitalWrite(DIAGONALE, HIGH);
+        digitalWrite(HORIZONTALE, LOW);
+        analogWrite(ana_a, 75);// donne une valeur de vitesse au moteur 80 demarrage 250 valeur max
+        analogWrite(ana_b, 250);   
+        break;
+
+      case 'I' : 
+        digitalWrite(VERTICALE, LOW);
+        digitalWrite(DIAGONALE, HIGH);
+        digitalWrite(HORIZONTALE, LOW);
+        analogWrite(ana_a, 250);// donne une valeur de vitesse au moteur 80 demarrage 250 valeur max
+        analogWrite(ana_b, 75);   
+        break;
+
+      case 'H' : 
+        digitalWrite(MarcheAvantA, HIGH);
+        digitalWrite(MarcheAvantB, HIGH);
+        digitalWrite(VERTICALE, LOW);
+        digitalWrite(DIAGONALE, HIGH);
+        digitalWrite(HORIZONTALE, LOW);
+        analogWrite(ana_a, 75);// donne une valeur de vitesse au moteur 80 demarrage 250 valeur max
+        analogWrite(ana_b, 250);   
+        break;
+
+      case 'J' : 
+        digitalWrite(MarcheAvantA, HIGH);
+        digitalWrite(MarcheAvantB, HIGH);
+        digitalWrite(VERTICALE, LOW);
+        digitalWrite(DIAGONALE, HIGH);
+        digitalWrite(HORIZONTALE, LOW);
+        analogWrite(ana_a, 250);// donne une valeur de vitesse au moteur 80 demarrage 250 valeur max
+        analogWrite(ana_b, 75);   
+        break;
+
+
+      case 'S' : 
+        digitalWrite(MarcheAvantA, LOW);
+        digitalWrite(MarcheAvantB, LOW);
+        digitalWrite(VERTICALE, LOW);
+        digitalWrite(DIAGONALE, LOW);
+        digitalWrite(HORIZONTALE, LOW);
+        analogWrite(ana_a, 0);// donne une valeur de vitesse au moteur 80 demarrage 250 valeur max
+        analogWrite(ana_b, 0);
+
+        break;
+        
+       /*case 'W' : 
+           for (int thisNote = 0; thisNote < 70; thisNote++) {  // for 70 notes... this is what happens
+           int noteDuration1 = 1000/noteDurations1[thisNote];  // sets up note duration for Darth Vader's Theme
+           tone(buzzer, melody1[thisNote],noteDuration1);  // tells the buzzer to play Darth Vader's Theme
+           int pauseBetweenNotes = noteDuration1 * 1.60;  // sets the tempo for the song
+           delay(pauseBetweenNotes);  // pauses the buzzer
+           noTone(buzzer);  // stops the buzzer playing
+           }
+        break;
+        case 'U' : 
+           for (int thisNote = 0; thisNote < 36; thisNote++) {  // for 36 notes this is what happens
+           int noteDuration5 = 1000/noteDurations5[thisNote];  // defines the note duration for may the force be with you
+           tone(buzzer, melody5[thisNote],noteDuration5);  // tells the buzzer to play may the force be with you
+           int pauseBetweenNotes5 = noteDuration5 * 1.1;  // sets the tempo
+           delay(pauseBetweenNotes5);  //pauses the buzzer
+           noTone(buzzer);  // stops the buzzer
+           }
+        break;
+        case 'V' : 
+           for (int thisNote = 0; thisNote < 91; thisNote++) {  // for 91 notes, this is what happens
+           int noteDuration2 = 1000/noteDurations2[thisNote];  // defines note duration for cantina band
+           tone(buzzer, melody2[thisNote],noteDuration2);  // tells the  buzzer to play the cantina band melody
+           int pauseBetweenNotes2 = noteDuration2 * 0.80; // sets the tempo
+           delay(pauseBetweenNotes2);  //pauses the buzzer
+           noTone(buzzer);  // stops the buzzer playing
+           }
+        break;*/
+
+      
+    
+ //   }
+ // } 
+}

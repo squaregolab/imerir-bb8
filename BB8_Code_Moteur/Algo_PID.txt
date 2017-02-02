@@ -1,0 +1,52 @@
+################################################
+###                 ALGO PID                 ###
+################################################
+
+float Kprop <- ????
+float Kint <- ????
+float Kderiv <- ????
+float Prev_err <- 0
+float integ <- 0
+
+float Erreur
+
+
+/**
+ *
+ * Commande -> consigne compris entre -10 < Delta < 5
+ * Erreur = Commande - mesure
+ * integ += Kint * (Erreur)
+ * sortie = integ + Kprop * Erreur + Kderiv * (Erreur - Prev_err)
+ * Prev_err = Erreur
+ *
+ */
+ 
+float Commande <- (Delta_min + Delta_max)/2
+ 
+Erreur <- Commande - Mesure
+ 
+PID(Erreur : float) : float
+	Si (Erreur < Delta_min OU Erreur < Delta_max)
+		integ += Kint * (Erreur)
+		sortie <- integ + Kprop * Erreur + Kderiv * (Erreur - Prev_err)
+		Prev_err <- Erreur
+	Fin Si
+	retour sortie
+Fin 
+
+Sens_de_Rotation() : BOOL
+	BOOL Horaire_Trigo <- LOW;
+	Si (Erreur < Delta_min)
+		Horaire_Trigo <- HIGH
+	Sinon si Erreur < Delta_max)
+		Horaire_Trigo <- LOW
+	Fin si
+	retour Horaire_Trigo
+Fin 
+
+
+
+
+
+
+
